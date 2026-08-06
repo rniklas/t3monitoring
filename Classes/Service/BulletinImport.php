@@ -25,7 +25,7 @@ class BulletinImport
             /** @var RequestFactory $requestFactory */
             $requestFactory = GeneralUtility::makeInstance(RequestFactory::class);
             $response = $requestFactory->request($this->url);
-            if ($response->getStatusCode() == 200) {
+            if ($response->getStatusCode() === 200) {
                 $rss = new \DOMDocument();
                 $rss->loadXML($response->getBody()->getContents());
 

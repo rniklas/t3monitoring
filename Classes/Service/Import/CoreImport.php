@@ -12,7 +12,7 @@ namespace T3Monitor\T3monitoring\Service\Import;
  */
 
 use T3Monitor\T3monitoring\Service\DataIntegrity;
-use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Http\RequestFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use UnexpectedValueException;
@@ -27,11 +27,18 @@ class CoreImport extends BaseImport
     public const URL = 'https://get.typo3.org/json';
     public const MINIMAL_TYPO3_VERSION = '4.5.0';
 
+    protected RequestFactory $requestFactory;
+
+    public function injectRequestFactory(RequestFactory $requestFactory): void
+    {
+        $this->requestFactory = $requestFactory;
+    }
+
     public function run(): void
     {
         $table = 'tx_t3monitoring_domain_model_core';
         $data = $this->getSimplifiedData();
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+        $queryBuilder = $this->connectionPool
             ->getQueryBuilderForTable($table);
         $rows = $queryBuilder
             ->select('uid', 'version')
@@ -43,16 +50,18 @@ class CoreImport extends BaseImport
             $previousCoreVersions[$row['version']] = $row;
         }
 
-        $connection = GeneralUtility::makeInstance(ConnectionPool::class)
+        $connection = $this->connectionPool
             ->getConnectionForTable($table);
         $connection->beginTransaction();
+
+        $now = $this->context->getPropertyFromAspect('date', 'timestamp');
 
         try {
             foreach ($data as $item) {
                 $version = $item['version'];
 
                 $item['pid'] = $this->emConfiguration->getPid();
-                $item['tstamp'] = $GLOBALS['EXEC_TIME'];
+                $item['tstamp'] = $now;
 
                 if (isset($previousCoreVersions[$version])) {
                     $connection->update(
@@ -63,7 +72,7 @@ class CoreImport extends BaseImport
                         ]
                     );
                 } else {
-                    $item['crdate'] = $GLOBALS['EXEC_TIME'];
+                    $item['crdate'] = $now;
 
                     $connection->insert(
                         $table,
@@ -176,7 +185,7 @@ class CoreImport extends BaseImport
             'release' => self::TYPE_RELEASE,
             'security' => self::TYPE_SECURITY,
             'development' => self::TYPE_DEVELOPMENT,
-            default => throw new UnexpectedValueException(sprintf('Not known type "%s" found', $type)),
+            default => throw new UnexpectedValueException(sprintf('Not known type "%s" found', $type), 7668754436),
         };
     }
 
@@ -185,9 +194,9 @@ class CoreImport extends BaseImport
      */
     protected function getRawData(): array
     {
-        $content = GeneralUtility::getUrl(self::URL);
+        $content = $this->requestFactory->request(self::URL)->getBody()->getContents();
         if (empty($content)) {
-            throw new UnexpectedValueException('JSON could not be downloaded');
+            throw new UnexpectedValueException('JSON could not be downloaded', 7181232307);
         }
 
         return (array)json_decode($content, true);

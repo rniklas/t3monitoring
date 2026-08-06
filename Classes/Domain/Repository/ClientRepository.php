@@ -66,6 +66,7 @@ class ClientRepository extends BaseRepository
         $demand->setWithInsecureExtensions(true);
         $demand->setWithExtraDanger(true);
 
+        $constraints = [];
         $constraints[] = $query->logicalOr(...$this->getConstraints($demand, $query));
 
         if ($emailAddressRequired) {
@@ -81,6 +82,9 @@ class ClientRepository extends BaseRepository
         return $query->execute()->toArray();
     }
 
+    /**
+     * @param QueryInterface<Client> $query
+     */
     protected function getConstraints(ClientFilterDemand $demand, QueryInterface $query): array
     {
         $constraints = [];

@@ -13,10 +13,11 @@ namespace T3Monitor\T3monitoring\Service;
 
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class DataIntegrity
+readonly class DataIntegrity
 {
+    public function __construct(private ConnectionPool $connectionPool) {}
+
     /**
      * Invoke after core import
      */
@@ -52,7 +53,7 @@ class DataIntegrity
         $table = 'tx_t3monitoring_domain_model_extension';
 
         // Patch release
-        $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable($table);
+        $connection = $this->connectionPool->getConnectionForTable($table);
 
         $queryBuilder = $connection->createQueryBuilder();
         $eb = $queryBuilder->expr();
@@ -84,7 +85,7 @@ class DataIntegrity
                 ->fetchAssociative();
 
             if (is_array($highestBugFixRelease)) {
-                $connection = GeneralUtility::makeInstance(ConnectionPool::class)
+                $connection = $this->connectionPool
                     ->getConnectionForTable($table);
                 $connection->update(
                     $table,
@@ -99,7 +100,7 @@ class DataIntegrity
         }
 
         // Minor release
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
+        $queryBuilder = $this->connectionPool->getQueryBuilderForTable($table);
         $res = $queryBuilder
             ->select('name', 'major_version')
             ->from($table)
@@ -176,7 +177,7 @@ class DataIntegrity
     {
         $table = 'tx_t3monitoring_domain_model_extension';
 
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
+        $queryBuilder = $this->connectionPool->getQueryBuilderForTable($table);
         $insecureExtensions = $queryBuilder
             ->select('uid', 'name', 'version_integer')
             ->from($table)
@@ -185,7 +186,7 @@ class DataIntegrity
             ->fetchAllAssociative();
 
         foreach ($insecureExtensions as $row) {
-            $queryBuilder2 = GeneralUtility::makeInstance(ConnectionPool::class)
+            $queryBuilder2 = $this->connectionPool
                 ->getQueryBuilderForTable($table);
             $nextSecureVersion = $queryBuilder2
                 ->select('uid', 'version')
@@ -200,7 +201,7 @@ class DataIntegrity
                 ->fetchAssociative();
 
             if (is_array($nextSecureVersion)) {
-                $connection = GeneralUtility::makeInstance(ConnectionPool::class)
+                $connection = $this->connectionPool
                     ->getConnectionForTable($table);
                 $connection->update($table, ['next_secure_version' => $nextSecureVersion['version']], ['uid' => $row['uid']]);
             }
@@ -213,7 +214,7 @@ class DataIntegrity
     protected function usedCore(): void
     {
         $table = 'tx_t3monitoring_domain_model_core';
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
+        $queryBuilder = $this->connectionPool->getQueryBuilderForTable($table);
         $rows = $queryBuilder
             ->select('tx_t3monitoring_domain_model_core.uid')
             ->from($table)
@@ -230,16 +231,14 @@ class DataIntegrity
             $coreRows[$row['uid']] = $row;
         }
 
-        $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable($table);
+        $connection = $this->connectionPool->getConnectionForTable($table);
         $qb = $connection->createQueryBuilder();
         $qb->update($table)
             ->set('is_used', 0)
             ->executeStatement();
-        if (!empty($coreRows)) {
-            foreach ($coreRows as $id => $row) {
-                $qb->where('uid = ' . $id);
-                $qb->set('is_used', 1)->executeStatement();
-            }
+        foreach (array_keys($coreRows) as $id) {
+            $qb->where('uid = ' . $id);
+            $qb->set('is_used', 1)->executeStatement();
         }
     }
 
@@ -248,7 +247,7 @@ class DataIntegrity
      */
     protected function usedExtensions(): void
     {
-        $connection = GeneralUtility::makeInstance(ConnectionPool::class)
+        $connection = $this->connectionPool
             ->getConnectionForTable('tx_t3monitoring_domain_model_client');
         $queryBuilder = $connection->createQueryBuilder();
         $clients = $queryBuilder

@@ -22,11 +22,12 @@ class ClientFilterDemandConverter extends AbstractTypeConverter
     /**
      * @var list<string>
      */
-    protected $sourceTypes = ['array', 'string'];
+    protected array $sourceTypes = ['array', 'string'];
 
-    protected $targetType = ClientFilterDemand::class;
+    /** @var class-string<ClientFilterDemand> */
+    protected string $targetType = ClientFilterDemand::class;
 
-    protected $priority = 10;
+    protected int $priority = 10;
 
     /**
      * Actually convert from $source to $targetType, by doing a typecast.
@@ -63,6 +64,6 @@ class ClientFilterDemandConverter extends AbstractTypeConverter
     {
         /** @var ServerRequest $request */
         $request = $GLOBALS['TYPO3_REQUEST'];
-        return $request->getParsedBody()['filter'] ?? $request->getQueryParams()['filter'] ?? [];
+        return ((array)$request->getParsedBody())['filter'] ?? $request->getQueryParams()['filter'] ?? [];
     }
 }

@@ -1,19 +1,85 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Property T3Monitor\\T3monitoring\\Domain\\Model\\Client\:\:\$extensions \(TYPO3\\CMS\\Extbase\\Persistence\\Generic\\LazyLoadingProxy\|TYPO3\\CMS\\Extbase\\Persistence\\ObjectStorage\<T3Monitor\\T3monitoring\\Domain\\Model\\Extension\>\) does not accept TYPO3\\CMS\\Extbase\\Persistence\\ObjectStorage\<object\>\.$#'
-			identifier: assign.propertyType
+			message: '''
+				#^Call to deprecated method makeLinkButton\(\) of class TYPO3\\CMS\\Backend\\Template\\Components\\ButtonBar\:
+				since v14, will be removed in v15\. Inject ComponentFactory and use ComponentFactory\:\:createLinkButton\(\) instead\.$#
+			'''
+			identifier: method.deprecated
+			count: 4
+			path: Classes/Controller/BaseController.php
+
+		-
+			message: '''
+				#^Call to deprecated method makeMenu\(\) of class TYPO3\\CMS\\Backend\\Template\\Components\\MenuRegistry\:
+				since v14, will be removed in v15\. Use GeneralUtility\:\:makeInstance\(Menu\:\:class\) directly or inject ComponentFactory and use createMenu\(\)\.$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: Classes/Controller/BaseController.php
+
+		-
+			message: '''
+				#^Call to deprecated method makeMenuItem\(\) of class TYPO3\\CMS\\Backend\\Template\\Components\\Menu\\Menu\:
+				since v14, will be removed in v15\. Use GeneralUtility\:\:makeInstance\(MenuItem\:\:class\) directly or inject ComponentFactory and use createMenuItem\(\)\.$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: Classes/Controller/BaseController.php
+
+		-
+			message: '''
+				#^Call to deprecated method setMetaInformation\(\) of class TYPO3\\CMS\\Backend\\Template\\Components\\DocHeaderComponent\:
+				since v14, will be removed in v15\. Use setPageBreadcrumb\(\) instead\.$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: Classes/Controller/BaseController.php
+
+		-
+			message: '#^Call to an undefined method TYPO3\\CMS\\Extbase\\Persistence\\Generic\\LazyLoadingProxy\|TYPO3\\CMS\\Extbase\\Persistence\\ObjectStorage\<T3Monitor\\T3monitoring\\Domain\\Model\\Extension\>\:\:attach\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: Classes/Domain/Model/Client.php
 
 		-
-			message: '#^Property T3Monitor\\T3monitoring\\Domain\\Model\\Client\:\:\$tag \(TYPO3\\CMS\\Extbase\\Persistence\\Generic\\LazyLoadingProxy\|TYPO3\\CMS\\Extbase\\Persistence\\ObjectStorage\<T3Monitor\\T3monitoring\\Domain\\Model\\Tag\>\) does not accept TYPO3\\CMS\\Extbase\\Persistence\\ObjectStorage\<object\>\.$#'
-			identifier: assign.propertyType
+			message: '#^Call to an undefined method TYPO3\\CMS\\Extbase\\Persistence\\Generic\\LazyLoadingProxy\|TYPO3\\CMS\\Extbase\\Persistence\\ObjectStorage\<T3Monitor\\T3monitoring\\Domain\\Model\\Extension\>\:\:detach\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: Classes/Domain/Model/Client.php
 
 		-
-			message: '#^Method TYPO3\\CMS\\Core\\Database\\Connection\:\:lastInsertId\(\) invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 2
-			path: Classes/Service/Import/ClientImport.php
+			message: '#^Method T3Monitor\\T3monitoring\\Domain\\Model\\Client\:\:getCore\(\) should return T3Monitor\\T3monitoring\\Domain\\Model\\Core\|null but returns object\|null\.$#'
+			identifier: return.type
+			count: 1
+			path: Classes/Domain/Model/Client.php
+
+		-
+			message: '#^Method T3Monitor\\T3monitoring\\Domain\\Model\\Client\:\:getExtensions\(\) should return TYPO3\\CMS\\Extbase\\Persistence\\ObjectStorage\<T3Monitor\\T3monitoring\\Domain\\Model\\Extension\> but returns object\|null\.$#'
+			identifier: return.type
+			count: 1
+			path: Classes/Domain/Model/Client.php
+
+		-
+			message: '#^Method T3Monitor\\T3monitoring\\Domain\\Model\\Client\:\:getSla\(\) should return T3Monitor\\T3monitoring\\Domain\\Model\\Sla\|null but returns object\|null\.$#'
+			identifier: return.type
+			count: 1
+			path: Classes/Domain/Model/Client.php
+
+		-
+			message: '#^Method T3Monitor\\T3monitoring\\Domain\\Model\\Client\:\:getTag\(\) should return TYPO3\\CMS\\Extbase\\Persistence\\ObjectStorage\<T3Monitor\\T3monitoring\\Domain\\Model\\Tag\> but returns object\|null\.$#'
+			identifier: return.type
+			count: 1
+			path: Classes/Domain/Model/Client.php
+
+		-
+			message: '#^Method T3Monitor\\T3monitoring\\Domain\\TypeConverter\\ClientFilterDemandConverter\:\:canConvertFrom\(\) has parameter \$source with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: Classes/Domain/TypeConverter/ClientFilterDemandConverter.php
+
+		-
+			message: '#^Variable method call on T3Monitor\\T3monitoring\\Domain\\Model\\Dto\\ClientFilterDemand\.$#'
+			identifier: method.dynamicName
+			count: 1
+			path: Classes/Domain/TypeConverter/ClientFilterDemandConverter.php

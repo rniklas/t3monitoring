@@ -12,6 +12,7 @@ namespace T3Monitor\T3monitoring\Tests\Unit\Command;
  */
 
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use T3Monitor\T3monitoring\Command\ReportAdminCommand;
@@ -31,17 +32,22 @@ class ReportAdminCommandTest extends UnitTestCase
         $dummyClients = ['123', '456'];
         $emailAddress = 'fo@bar.com';
 
-        /** @var ReportAdminCommand|AccessibleObjectInterface $mockedClientImport */
-        $mockedClientImport = $this->getAccessibleMock(ReportAdminCommand::class, ['dummy'], [], '', false);
+        /** @var ReportAdminCommand&MockObject&AccessibleObjectInterface $mockedClientImport */
+        $mockedClientImport = $this->getAccessibleMock(ReportAdminCommand::class, null, [], '', false);
         $mockedClientImport->_set('clients', $dummyClients);
 
-        $emailNotification = $this->createMock(EmailNotification::class);
-        $emailNotification->expects(self::any())->method('sendAdminEmail')->with($emailAddress, $dummyClients);
+        $emailNotification = $this->getMockBuilder(EmailNotification::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['sendAdminEmail'])
+            ->getMock();
+        $emailNotification->expects(self::atLeastOnce())->method('sendAdminEmail')->with($emailAddress, $dummyClients);
         GeneralUtility::addInstance(EmailNotification::class, $emailNotification);
 
         $input = self::createStub(InputInterface::class);
         $input->method('getArgument')->willReturn($emailAddress);
 
-        $mockedClientImport->_call('execute', $input, GeneralUtility::makeInstance(OutputInterface::class));
+        $output = self::createStub(OutputInterface::class);
+
+        $mockedClientImport->_call('execute', $input, $output);
     }
 }

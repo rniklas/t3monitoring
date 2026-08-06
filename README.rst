@@ -9,20 +9,8 @@ This extensions provides the possibility to monitor all of your TYPO3 installati
 
 **Requirements**
 
-- At least TYPO3 CMS 12 LTS (monitoring works also for 6.2 installations)
+- At least TYPO3 CMS 13 LTS (monitoring works also for 6.2 installations)
 - The host must have access to every client to be able to fetch the data
-
-**Pricing**
-
-This extension is completely free to use! However maintaining an extension takes an enormous amount of time.
-Therefore I am using a concept which is based on your trust!
-If you use this extension to monitor your clients, please consider to pay (once):
-
-- € 150 for less than 20 clients
-- € 350 for less than 100 clients
-- € 500 for more than 100 clients
-
-Please contact me via email (mail@ringer.it) or slack for questions and to receive an invoice!
 
 Screenshots
 ^^^^^^^^^^^

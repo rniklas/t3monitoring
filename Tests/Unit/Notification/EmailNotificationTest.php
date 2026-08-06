@@ -14,6 +14,7 @@ namespace T3Monitor\T3monitoring\Tests\Unit\Notification;
 use PHPUnit\Framework\Attributes\Test;
 use T3Monitor\T3monitoring\Domain\Model\Client;
 use T3Monitor\T3monitoring\Notification\EmailNotification;
+use TYPO3\CMS\Core\View\ViewFactoryInterface;
 use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
 /**
@@ -27,7 +28,7 @@ class EmailNotificationTest extends UnitTestCase
     public function sendAdminEmailThrowsExceptionForInvalidEmailAddress(): void
     {
         $this->expectException(\UnexpectedValueException::class);
-        $notification = new EmailNotification();
+        $notification = new EmailNotification(self::createStub(ViewFactoryInterface::class));
         $notification->sendAdminEmail('invalid', [new Client()]);
     }
 
@@ -35,14 +36,17 @@ class EmailNotificationTest extends UnitTestCase
     public function sendAdminEmailThrowsExceptionForNoClients(): void
     {
         $this->expectException(\UnexpectedValueException::class);
-        $notification = new EmailNotification();
+        $view = self::createStub(ViewFactoryInterface::class);
+        $notification = new EmailNotification($view);
         $notification->sendAdminEmail('john@doe.com', []);
     }
 
     #[Test]
     public function senderEmailNameIsCorrectlyReturned(): void
     {
-        $notification = $this->getAccessibleMock(EmailNotification::class, ['dummy']);
+        $notification = $this->getAccessibleMock(EmailNotification::class, null, [
+            self::createStub(ViewFactoryInterface::class),
+        ]);
 
         unset($GLOBALS['TYPO3_CONF_VARS']['MAIL']['defaultMailFromName']);
         self::assertEquals(EmailNotification::DEFAULT_EMAIL_NAME, $notification->_call('getSenderEmailName'));
@@ -54,7 +58,9 @@ class EmailNotificationTest extends UnitTestCase
     #[Test]
     public function senderEmailAddressIsCorrectlyReturned(): void
     {
-        $notification = $this->getAccessibleMock(EmailNotification::class, ['dummy']);
+        $notification = $this->getAccessibleMock(EmailNotification::class, null, [
+            self::createStub(ViewFactoryInterface::class),
+        ]);
 
         unset($GLOBALS['TYPO3_CONF_VARS']['MAIL']['defaultMailFromAddress']);
         self::assertEquals(EmailNotification::DEFAULT_EMAIL_ADDRESS, $notification->_call('getSenderEmailAddress'));

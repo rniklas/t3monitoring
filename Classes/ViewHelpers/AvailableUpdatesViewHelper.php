@@ -46,15 +46,17 @@ class AvailableUpdatesViewHelper extends AbstractViewHelper
         foreach ($versions as $name => $version) {
             if (!empty($version) && $extension->getVersion() !== $version && !isset($result[$version])) {
                 $extDetails = self::getExtDetails($extension->getName(), $version);
+                $typo3MinVersion = (int)($extDetails['typo3_min_version'] ?? 0);
+                $typo3MaxVersion = (int)($extDetails['typo3_max_version'] ?? 0);
                 $result[$version] = [
                     'name' => $name,
                     'version' => $version,
                     'identifier' => 'id-' . md5($name . $version),
-                    'typo3MinVersion' => $extDetails['typo3_min_version'],
-                    'typo3MaxVersion' => $extDetails['typo3_max_version'],
+                    'typo3MinVersion' => $typo3MinVersion,
+                    'typo3MaxVersion' => $typo3MaxVersion,
                     'coreVersion' => $core->getVersionInteger(),
-                    'extCompatibility' => self::getCompatibility($extDetails['typo3_min_version'], $extDetails['typo3_max_version'], $core),
-                    'serializedDependencies' => $extDetails['serialized_dependencies'],
+                    'extCompatibility' => self::getCompatibility($typo3MinVersion, $typo3MaxVersion, $core),
+                    'serializedDependencies' => $extDetails['serialized_dependencies'] ?? '',
                 ];
             }
         }

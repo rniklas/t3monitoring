@@ -16,17 +16,12 @@ use T3Monitor\T3monitoring\Domain\Model\Client;
 use T3Monitor\T3monitoring\Service\Import\ClientImport;
 use TYPO3\CMS\Backend\Attribute\AsController;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Annotation\IgnoreValidation;
 
 #[AsController]
 class ClientController extends BaseController
 {
-    /**
-     * Show client
-     *
-     * @param Client|null $client
-     * @return ResponseInterface
-     * @TYPO3\CMS\Extbase\Annotation\IgnoreValidation $client
-     */
+    #[IgnoreValidation(['argumentName' => 'client'])]
     public function showAction(?Client $client = null): ResponseInterface
     {
         if ($client === null) {
@@ -41,13 +36,7 @@ class ClientController extends BaseController
         return $this->htmlResponse();
     }
 
-    /**
-     * Fetch client
-     *
-     * @param Client|null $client
-     * @return ResponseInterface
-     * @TYPO3\CMS\Extbase\Annotation\IgnoreValidation $client
-     */
+    #[IgnoreValidation(['argumentName' => 'client'])]
     public function fetchAction(?Client $client = null): ResponseInterface
     {
         if ($client === null) {

@@ -15,14 +15,18 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\Mime\Address;
 use T3Monitor\T3monitoring\Domain\Model\Client;
+use TYPO3\CMS\Core\Mail\MailerInterface;
 use TYPO3\CMS\Core\Mail\MailMessage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Fluid\View\StandaloneView;
+use TYPO3\CMS\Core\View\ViewFactoryData;
+use TYPO3\CMS\Core\View\ViewFactoryInterface;
 use UnexpectedValueException;
 
 class EmailNotification implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
+
+    public function __construct(protected ViewFactoryInterface $viewFactory) {}
 
     public const DEFAULT_EMAIL_NAME = 'EXT:t3monitoring';
     public const DEFAULT_EMAIL_ADDRESS = 'no-reply@example.com';
@@ -36,11 +40,11 @@ class EmailNotification implements LoggerAwareInterface
     public function sendAdminEmail(string $email, array $clients, string $subject = 'Monitoring Report'): void
     {
         if (!GeneralUtility::validEmail($email)) {
-            throw new UnexpectedValueException('The email address is not valid');
+            throw new UnexpectedValueException('The email address is not valid', 6668173161);
         }
 
         if (count($clients) === 0) {
-            throw new UnexpectedValueException('No clients given');
+            throw new UnexpectedValueException('No clients given', 4679442202);
         }
 
         $arguments = [
@@ -69,7 +73,7 @@ class EmailNotification implements LoggerAwareInterface
         }
     }
 
-    public function sendClientFailedEmail(array $clients, string $emailAddress, $subject = 'Monitoring Client Connection Failure'): void
+    public function sendClientFailedEmail(array $clients, string $emailAddress, string $subject = 'Monitoring Client Connection Failure'): void
     {
         if (empty($emailAddress)) {
             return;
@@ -98,7 +102,9 @@ class EmailNotification implements LoggerAwareInterface
             $mailMessage->html($htmlContent);
         }
 
-        return $mailMessage->send();
+        $mailer = GeneralUtility::makeInstance(MailerInterface::class);
+        $mailer->send($mailMessage);
+        return $mailer->getSentMessage() !== null;
     }
 
     /**
@@ -111,14 +117,17 @@ class EmailNotification implements LoggerAwareInterface
      */
     protected function getFluidTemplate(array $arguments, string $file, string $format = 'html'): string
     {
-        /** @var StandaloneView $renderer */
-        $renderer = GeneralUtility::makeInstance(StandaloneView::class);
-        $renderer->setFormat($format);
         $path = GeneralUtility::getFileAbsFileName('EXT:t3monitoring/Resources/Private/Templates/Notification/' . $file);
-        $renderer->setTemplatePathAndFilename($path);
-        $renderer->assignMultiple($arguments);
 
-        return trim($renderer->render());
+        $vfd = new ViewFactoryData(
+            templatePathAndFilename: $path,
+            format: $format,
+        );
+
+        $view = $this->viewFactory->create($vfd);
+        $view->assignMultiple($arguments);
+
+        return trim($view->render());
     }
 
     /**

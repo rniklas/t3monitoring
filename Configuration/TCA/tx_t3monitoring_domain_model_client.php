@@ -24,9 +24,9 @@ return [
         --div--;General,--palette--;;paletteTitle, --palette--;;paletteDomain,email,sla,tag,comment,
         --div--;Readonly information,last_successful_import,error_message,--palette--;;paletteCore, --palette--;;paletteExtensions, --palette--;;paletteVersions, --palette--;;paletteDiskSpace,
         --div--;Extra,extra_info,extra_warning,extra_danger,
-        --div--;LLL:EXT:core/Resources/Private/Language/Form/locallang_tabs.xlf:access,
+        --div--;core.form.tabs:access,
                 hidden,
-            --div--;LLL:EXT:core/Resources/Private/Language/Form/locallang_tabs.xlf:extended,',
+            --div--;core.form.tabs:extended,',
         ],
     ],
     'palettes' => [
@@ -91,6 +91,7 @@ return [
                 'type' => 'input',
                 'size' => 30,
                 'eval' => 'trim',
+                'searchable' => false,
             ],
         ],
         'basic_auth_password' => [
@@ -99,6 +100,7 @@ return [
                 'type' => 'input',
                 'size' => 30,
                 'eval' => 'trim',
+                'searchable' => false,
             ],
         ],
         'host_header' => [
@@ -108,6 +110,7 @@ return [
                 'size' => 30,
                 'eval' => 'trim',
                 'placeholder' => 'app.myproject.com',
+                'searchable' => false,
             ],
         ],
         'ignore_cert_errors' => [
@@ -252,6 +255,7 @@ return [
                 'default' => '',
                 'cols' => 40,
                 'rows' => 5,
+                'searchable' => false,
             ],
         ],
         'extra_warning' => [
@@ -262,6 +266,7 @@ return [
                 'default' => '',
                 'cols' => 40,
                 'rows' => 5,
+                'searchable' => false,
             ],
         ],
         'extra_danger' => [
@@ -272,6 +277,7 @@ return [
                 'default' => '',
                 'cols' => 40,
                 'rows' => 5,
+                'searchable' => false,
             ],
         ],
         'last_successful_import' => [
@@ -281,6 +287,7 @@ return [
                 'type' => 'datetime',
                 'default' => 0,
                 'size' => 10,
+                'searchable' => false,
             ],
         ],
         'extensions' => [

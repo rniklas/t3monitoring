@@ -9,14 +9,14 @@
 		"php": "^8.2",
 		"ext-json": "*",
 		"ext-dom": "*",
-		"typo3/cms-core": "^12.4.10 || ^13",
-		"typo3/cms-backend": "^12 || ^13",
-		"typo3/cms-extbase": "^12 || ^13",
-		"typo3/cms-extensionmanager": "^12 || ^13"
+		"typo3/cms-core": "^13 || ^14",
+		"typo3/cms-backend": "^13 || ^14",
+		"typo3/cms-extbase": "^13 || ^14",
+		"typo3/cms-extensionmanager": "^13 || ^14"
 	},
 	"require-dev": {
-		"typo3/minimal": "^12 || ^13",
-		"typo3/testing-framework": "^8 || ^9"
+		"typo3/minimal": "^13 || ^14",
+		"typo3/testing-framework": "^9"
 	},
 	"autoload": {
 		"psr-4": {
@@ -39,10 +39,14 @@
 	"extra": {
 		"typo3/cms": {
 			"web-dir": ".Build/web",
-			"extension-key": "t3monitoring"
+			"extension-key": "t3monitoring",
+			"version": "4.0.0",
+			"Package": {
+				"providesPackages": {}
+			}
 		},
 		"branch-alias": {
-			"dev-master": "3.x-dev"
+			"dev-master": "4.x-dev"
 		}
 	}
 }

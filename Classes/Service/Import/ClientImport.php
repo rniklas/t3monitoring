@@ -18,7 +18,6 @@ use T3Monitor\T3monitoring\Event\ImportClientDataEvent;
 use T3Monitor\T3monitoring\Notification\EmailNotification;
 use T3Monitor\T3monitoring\Service\DataIntegrity;
 use TYPO3\CMS\Core\Database\Connection;
-use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Http\RequestFactory;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -31,18 +30,12 @@ class ClientImport extends BaseImport
     protected array $coreVersions = [];
     protected array $responseCount = ['error' => 0, 'success' => 0];
     protected array $failedClients = [];
-    protected EmailNotification $emailNotification;
-
-    public function __construct()
-    {
-        $this->coreVersions = $this->getAllCoreVersions();
-        $this->emailNotification = GeneralUtility::makeInstance(EmailNotification::class);
-        parent::__construct();
-    }
 
     public function run(int $clientId = 0): void
     {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+        $this->coreVersions = $this->getAllCoreVersions();
+
+        $queryBuilder = $this->connectionPool
             ->getQueryBuilderForTable(self::TABLE);
         $query = $queryBuilder
             ->select('*')
@@ -63,10 +56,11 @@ class ClientImport extends BaseImport
             $this->importSingleClient($client);
         }
 
+        $emailNotification = GeneralUtility::makeInstance(EmailNotification::class);
         if ($this->responseCount['error'] > 0) {
             $clientsForMailNotification = $this->getClientsForMailNotification();
             if (count($clientsForMailNotification) > 0) {
-                $this->emailNotification->sendClientFailedEmail($clientsForMailNotification, $this->emConfiguration->getEmailForFailedClient());
+                $emailNotification->sendClientFailedEmail($clientsForMailNotification, $this->emConfiguration->getEmailForFailedClient());
             }
         }
 
@@ -84,17 +78,18 @@ class ClientImport extends BaseImport
     {
         try {
             $response = $this->requestClientData($row);
-            if (empty($response)) {
-                throw new RuntimeException('Empty response from client ' . $row['title']);
+            if ($response === '') {
+                throw new RuntimeException('Empty response from client ' . $row['title'], 8032800951);
             }
             $json = json_decode($response, true);
             if (!is_array($json) || !array_key_exists('core', $json) || !is_array($json['core']) || !array_key_exists('typo3Version', $json['core'])) {
-                throw new RuntimeException('Invalid response from client ' . $row['title']);
+                throw new RuntimeException('Invalid response from client ' . $row['title'], 1778522970);
             }
 
+            $now = $this->context->getPropertyFromAspect('date', 'timestamp');
             $update = [
-                'tstamp' => $GLOBALS['EXEC_TIME'],
-                'last_successful_import' => $GLOBALS['EXEC_TIME'],
+                'tstamp' => $now,
+                'last_successful_import' => $now,
                 'error_message' => '',
                 'php_version' => $json['core']['phpVersion'],
                 'mysql_version' => $json['core']['mysqlClientVersion'],
@@ -105,6 +100,7 @@ class ClientImport extends BaseImport
                 'error_count' => 0,
             ];
 
+            /** @var ImportClientDataEvent $event */
             $event = $this->eventDispatcher->dispatch(
                 new ImportClientDataEvent($json, $row, $update)
             );
@@ -114,7 +110,7 @@ class ClientImport extends BaseImport
             $this->addExtraData($json, $update, 'warning');
             $this->addExtraData($json, $update, 'danger');
 
-            $connection = GeneralUtility::makeInstance(ConnectionPool::class)
+            $connection = $this->connectionPool
                 ->getConnectionForTable(self::TABLE);
             $connection->update(self::TABLE, $update, ['uid' => (int)$row['uid']]);
 
@@ -146,7 +142,7 @@ class ClientImport extends BaseImport
         $this->responseCount['error']++;
         $this->failedClients[] = $client;
 
-        $connection = GeneralUtility::makeInstance(ConnectionPool::class)
+        $connection = $this->connectionPool
             ->getConnectionForTable(self::TABLE);
         $connection->update(
             self::TABLE,
@@ -160,7 +156,7 @@ class ClientImport extends BaseImport
         );
     }
 
-    protected function requestClientData(array $row)
+    protected function requestClientData(array $row): string
     {
         $domain = $this->unifyDomain($row['domain']);
         $url = $domain . '/index.php?eID=t3monitoring&secret=' . rawurlencode($row['secret']);
@@ -185,13 +181,13 @@ class ClientImport extends BaseImport
         }
         $response = $requestFactory->request($url, 'GET', $additionalOptions);
         if (!empty($response->getReasonPhrase()) && $response->getReasonPhrase() !== 'OK') {
-            throw new RuntimeException($response->getReasonPhrase());
+            throw new RuntimeException($response->getReasonPhrase(), 6693843014);
         }
         if (in_array($response->getStatusCode(), [ 200, 301, 302 ], true)) {
-            $response = $response->getBody()->getContents();
+            return $response->getBody()->getContents();
         }
 
-        return $response;
+        return '';
     }
 
     protected function unifyDomain(string $domain): string
@@ -207,7 +203,7 @@ class ClientImport extends BaseImport
     protected function handleExtensionRelations(int $client, array $extensions = []): int
     {
         $table = 'tx_t3monitoring_domain_model_extension';
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+        $queryBuilder = $this->connectionPool
             ->getQueryBuilderForTable($table);
 
         $whereClause = [];
@@ -227,6 +223,7 @@ class ClientImport extends BaseImport
             ->executeQuery()
             ->fetchAllAssociative();
 
+        $now = $this->context->getPropertyFromAspect('date', 'timestamp');
         $relationsToBeAdded = [];
         foreach ($extensions as $key => $data) {
             // search if exists
@@ -249,7 +246,7 @@ class ClientImport extends BaseImport
                 $versionSplit = explode('.', $version, 3);
 
                 $insert = [
-                    'crdate' => $GLOBALS['EXEC_TIME'],
+                    'crdate' => $now,
                     'pid' => $this->emConfiguration->getPid(),
                     'name' => $key,
                     'version' => (string)$version,
@@ -260,9 +257,9 @@ class ClientImport extends BaseImport
                     'description' => $data['description'] ?? '',
                     'author_name' => $data['author'] ?? '',
                     'state' => $state,
-                    'category' => (int)array_search($category, Extension::$defaultCategories),
+                    'category' => (int)array_search($category, Extension::$defaultCategories, true),
                     'is_official' => 0,
-                    'tstamp' => $GLOBALS['EXEC_TIME'],
+                    'tstamp' => $now,
                     'update_comment' => '',
                 ];
 
@@ -272,7 +269,7 @@ class ClientImport extends BaseImport
 
                 $connection = $this->getConnectionTableFor($table);
                 $connection->insert('tx_t3monitoring_domain_model_extension', $insert);
-                $relationId = $connection->lastInsertId('tx_t3monitoring_domain_model_extension');
+                $relationId = $connection->lastInsertId();
             }
             $fields = ['uid_local', 'uid_foreign', 'title', 'state', 'is_loaded'];
             $relationsToBeAdded[] = [
@@ -321,7 +318,7 @@ class ClientImport extends BaseImport
         ];
 
         $connection->insert('tx_t3monitoring_domain_model_core', $insert);
-        $newId = (int)$connection->lastInsertId('tx_t3monitoring_domain_model_core');
+        $newId = (int)$connection->lastInsertId();
         $this->coreVersions[$version] = ['uid' => $newId, 'version' => $version];
 
         return $newId;
@@ -329,7 +326,7 @@ class ClientImport extends BaseImport
 
     protected function getAllCoreVersions(): array
     {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+        $queryBuilder = $this->connectionPool
             ->getQueryBuilderForTable('tx_t3monitoring_domain_model_core');
         $rows = $queryBuilder
             ->select('uid', 'version')
@@ -345,7 +342,7 @@ class ClientImport extends BaseImport
 
     private function getConnectionTableFor(string $table): Connection
     {
-        return GeneralUtility::makeInstance(ConnectionPool::class)
+        return $this->connectionPool
             ->getConnectionForTable($table);
     }
 

@@ -11,19 +11,16 @@ namespace T3Monitor\T3monitoring\Command;
  * LICENSE.txt file that was distributed with this source code.
  */
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use T3Monitor\T3monitoring\Service\Import\ExtensionImport;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
+#[AsCommand('monitoring:importExtensions', 'Import extensions from TER')]
 class ImportExtensionsCommand extends Command
 {
-    protected function configure(): void
-    {
-        $this->setDescription('Import extensions');
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         GeneralUtility::makeInstance(ExtensionImport::class)->run();

@@ -15,10 +15,8 @@ use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 class DependenciesViewHelper extends AbstractViewHelper
 {
-    /** @var bool */
     protected $escapeOutput = false;
 
-    /** @var bool */
     protected $escapeChildren = false;
 
     public function initializeArguments(): void

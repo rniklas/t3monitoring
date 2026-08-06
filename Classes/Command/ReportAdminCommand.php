@@ -11,6 +11,7 @@ namespace T3Monitor\T3monitoring\Command;
  * LICENSE.txt file that was distributed with this source code.
  */
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -23,6 +24,7 @@ use T3Monitor\T3monitoring\Notification\EmailNotification;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
+#[AsCommand('reporting:admin', 'Generate collective report for all insecure clients (core or extensions)')]
 class ReportAdminCommand extends Command
 {
     /** @var Client[] */
@@ -31,7 +33,6 @@ class ReportAdminCommand extends Command
     protected function configure(): void
     {
         $this->addArgument('email', InputArgument::OPTIONAL, 'Email address to send report to', '');
-        $this->setDescription('Generate collective report for all insecure clients (core or extensions)');
     }
 
     protected function initialize(InputInterface $input, OutputInterface $output): void
@@ -54,7 +55,7 @@ class ReportAdminCommand extends Command
             if (GeneralUtility::validEmail($email)) {
                 GeneralUtility::makeInstance(EmailNotification::class)->sendAdminEmail($email, $this->clients);
             } else {
-                throw new \UnexpectedValueException(sprintf('Email address "%s" is invalid!', $email));
+                throw new \UnexpectedValueException(sprintf('Email address "%s" is invalid!', $email), 5742059798);
             }
         } else {
             $collectedClientData = [];

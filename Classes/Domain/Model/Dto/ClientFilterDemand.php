@@ -45,7 +45,7 @@ class ClientFilterDemand extends AbstractEntity
         return $this->sla;
     }
 
-    public function setSla($sla): static
+    public function setSla(string|int $sla): static
     {
         $this->sla = (int)$sla;
         return $this;
@@ -56,7 +56,7 @@ class ClientFilterDemand extends AbstractEntity
         return $this->tag;
     }
 
-    public function setTag($tag): static
+    public function setTag(string|int $tag): static
     {
         $this->tag = (int)$tag;
         return $this;
@@ -78,7 +78,7 @@ class ClientFilterDemand extends AbstractEntity
         return $this->withErrorMessage;
     }
 
-    public function setWithErrorMessage($withErrorMessage): static
+    public function setWithErrorMessage(string|bool $withErrorMessage): static
     {
         $this->withErrorMessage = (bool)$withErrorMessage;
         return $this;
@@ -89,7 +89,7 @@ class ClientFilterDemand extends AbstractEntity
         return $this->withInsecureExtensions;
     }
 
-    public function setWithInsecureExtensions($withInsecureExtensions): static
+    public function setWithInsecureExtensions(string|bool $withInsecureExtensions): static
     {
         $this->withInsecureExtensions = (bool)$withInsecureExtensions;
         return $this;
@@ -100,7 +100,7 @@ class ClientFilterDemand extends AbstractEntity
         return $this->withInsecureCore;
     }
 
-    public function setWithInsecureCore($withInsecureCore): static
+    public function setWithInsecureCore(string|bool $withInsecureCore): static
     {
         $this->withInsecureCore = (bool)$withInsecureCore;
         return $this;
@@ -111,7 +111,7 @@ class ClientFilterDemand extends AbstractEntity
         return $this->withOutdatedCore;
     }
 
-    public function setWithOutdatedCore($withOutdatedCore): static
+    public function setWithOutdatedCore(string|bool $withOutdatedCore): static
     {
         $this->withOutdatedCore = (bool)$withOutdatedCore;
         return $this;
@@ -122,7 +122,7 @@ class ClientFilterDemand extends AbstractEntity
         return $this->withOutdatedExtensions;
     }
 
-    public function setWithOutdatedExtensions($withOutdatedExtensions): static
+    public function setWithOutdatedExtensions(string|bool $withOutdatedExtensions): static
     {
         $this->withOutdatedExtensions = (bool)$withOutdatedExtensions;
         return $this;
@@ -133,7 +133,7 @@ class ClientFilterDemand extends AbstractEntity
         return $this->withExtraInfo;
     }
 
-    public function setWithExtraInfo($withExtraInfo): static
+    public function setWithExtraInfo(string|bool $withExtraInfo): static
     {
         $this->withExtraInfo = (bool)$withExtraInfo;
         return $this;
@@ -144,7 +144,7 @@ class ClientFilterDemand extends AbstractEntity
         return $this->withExtraWarning;
     }
 
-    public function setWithExtraWarning($withExtraWarning): static
+    public function setWithExtraWarning(string|bool $withExtraWarning): static
     {
         $this->withExtraWarning = (bool)$withExtraWarning;
         return $this;
@@ -155,7 +155,7 @@ class ClientFilterDemand extends AbstractEntity
         return $this->withExtraDanger;
     }
 
-    public function setWithExtraDanger($withExtraDanger): static
+    public function setWithExtraDanger(string|bool $withExtraDanger): static
     {
         $this->withExtraDanger = (bool)$withExtraDanger;
         return $this;
@@ -166,7 +166,7 @@ class ClientFilterDemand extends AbstractEntity
         return $this->withEmailAddress;
     }
 
-    public function setWithEmailAddress($withEmailAddress): static
+    public function setWithEmailAddress(string|bool $withEmailAddress): static
     {
         $this->withEmailAddress = (bool)$withEmailAddress;
         return $this;

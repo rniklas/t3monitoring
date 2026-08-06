@@ -16,7 +16,6 @@ use T3Monitor\T3monitoring\Domain\Model\Dto\ExtensionFilterDemand;
 use T3Monitor\T3monitoring\Domain\Model\Extension;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Persistence\QueryInterface;
 use TYPO3\CMS\Extbase\Persistence\QueryResultInterface;
 
@@ -25,6 +24,11 @@ use TYPO3\CMS\Extbase\Persistence\QueryResultInterface;
  */
 class ExtensionRepository extends BaseRepository
 {
+    public function __construct(private readonly ConnectionPool $connectionPool)
+    {
+        parent::__construct();
+    }
+
     public function initializeObject(): void
     {
         $this->setDefaultOrderings(['name' => QueryInterface::ORDER_ASCENDING]);
@@ -51,7 +55,7 @@ class ExtensionRepository extends BaseRepository
      */
     public function findByDemand(ExtensionFilterDemand $demand): array
     {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('tx_t3monitoring_domain_model_extension');
+        $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tx_t3monitoring_domain_model_extension');
         $expressionBuilder = $queryBuilder->expr();
         $queryBuilder
             ->select('client.title', 'client.uid as clientUid', 'ext.name', 'ext.version', 'ext.insecure')

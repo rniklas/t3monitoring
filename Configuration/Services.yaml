@@ -11,45 +11,19 @@ services:
   T3Monitor\T3monitoring\Domain\Model\Dto\EmMonitoringConfiguration:
     public: true
 
+  T3Monitor\T3monitoring\Service\Import\:
+    resource: '../Classes/Service/Import/*'
+    public: true
+
+  T3Monitor\T3monitoring\Service\DataIntegrity:
+    public: true
+
+  T3Monitor\T3monitoring\Notification\EmailNotification:
+    public: true
+
   T3Monitor\T3monitoring\Domain\TypeConverter\ClientFilterDemandConverter:
     tags:
       - name: extbase.type_converter
         priority: 10
         target: T3Monitor\T3monitoring\Domain\Model\Dto\ClientFilterDemand
         sources: array,string
-
-  T3Monitor\T3monitoring\Command\ImportCoreCommand:
-    tags:
-      - name: 'console.command'
-        command: 'monitoring:importCore'
-        schedulable: true
-
-  T3Monitor\T3monitoring\Command\ImportExtensionsCommand:
-    tags:
-      - name: 'console.command'
-        command: 'monitoring:importExtensions'
-        schedulable: true
-
-  T3Monitor\T3monitoring\Command\ImportClientsCommand:
-    tags:
-      - name: 'console.command'
-        command: 'monitoring:importClients'
-        schedulable: true
-
-  T3Monitor\T3monitoring\Command\ImportAllCommand:
-    tags:
-      - name: 'console.command'
-        command: 'monitoring:importAll'
-        schedulable: true
-
-  T3Monitor\T3monitoring\Command\ReportAdminCommand:
-    tags:
-      - name: 'console.command'
-        command: 'reporting:admin'
-        schedulable: true
-
-  T3Monitor\T3monitoring\Command\ReportClientCommand:
-    tags:
-      - name: 'console.command'
-        command: 'reporting:client'
-        schedulable: true

@@ -11,6 +11,7 @@ namespace T3Monitor\T3monitoring\Command;
  * LICENSE.txt file that was distributed with this source code.
  */
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -19,13 +20,9 @@ use T3Monitor\T3monitoring\Notification\EmailNotification;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
+#[AsCommand('reporting:client', 'Report clients')]
 class ReportClientCommand extends Command
 {
-    protected function configure(): void
-    {
-        $this->setDescription('Report clients');
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $clients = GeneralUtility::makeInstance(ClientRepository::class)->getAllForReport(true);

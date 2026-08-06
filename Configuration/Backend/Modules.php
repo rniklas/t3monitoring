@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 return [
     't3monitoring' => [
-        'parent' => 'tools',
+        'parent' => 'system',
         'position' => ['top'],
-        'access' => 'user,group',
+        'access' => 'user',
         'icon' => 'EXT:t3monitoring/Resources/Public/Icons/module.svg',
         'labels' => 'LLL:EXT:t3monitoring/Resources/Private/Language/locallang_t3monitor.xlf',
         'extensionName' => 't3monitoring',

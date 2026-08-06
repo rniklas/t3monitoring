@@ -13,13 +13,14 @@ namespace T3Monitor\T3monitoring\Domain\Repository;
 
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class StatisticRepository extends BaseRepository
+readonly class StatisticRepository
 {
+    public function __construct(private ConnectionPool $connectionPool) {}
+
     public function getUsedCoreVersionCount(): array
     {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+        $queryBuilder = $this->connectionPool
             ->getQueryBuilderForTable('tx_t3monitoring_domain_model_core');
         return $queryBuilder
             ->select(

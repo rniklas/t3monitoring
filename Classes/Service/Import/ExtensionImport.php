@@ -13,7 +13,6 @@ namespace T3Monitor\T3monitoring\Service\Import;
 
 use InvalidArgumentException;
 use T3Monitor\T3monitoring\Service\DataIntegrity;
-use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use TYPO3\CMS\Extensionmanager\Remote\RemoteRegistry;
@@ -39,8 +38,10 @@ class ExtensionImport extends BaseImport
 
     protected function insertExtensionsInCustomTable(): void
     {
+        $now = $this->context->getPropertyFromAspect('date', 'timestamp');
+
         $table = 'tx_t3monitoring_domain_model_extension';
-        $queryBuilderCoreExtensions = GeneralUtility::makeInstance(ConnectionPool::class)
+        $queryBuilderCoreExtensions = $this->connectionPool
             ->getQueryBuilderForTable('tx_extensionmanager_domain_model_extension');
         $res = $queryBuilderCoreExtensions
             ->select('extension_key', 'state', 'review_state', 'version', 'title', 'category', 'description', 'last_updated', 'author_name', 'update_comment', 'integer_version', 'current_version', 'serialized_dependencies')
@@ -49,7 +50,7 @@ class ExtensionImport extends BaseImport
                 $queryBuilderCoreExtensions->expr()->gt('last_updated', $queryBuilderCoreExtensions->createNamedParameter(strtotime(self::MIN_DATE)))
             )->executeQuery();
 
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+        $queryBuilder = $this->connectionPool
             ->getQueryBuilderForTable($table);
         while ($row = $res->fetchAssociative()) {
             $versionSplit = explode('.', $row['version'], 3);
@@ -71,7 +72,7 @@ class ExtensionImport extends BaseImport
                 'state' => $row['state'],
                 'category' => $row['category'],
                 'serialized_dependencies' => (string)$row['serialized_dependencies'],
-                'tstamp' => $GLOBALS['EXEC_TIME'],
+                'tstamp' => $now,
             ];
 
             $this->addCoreDependenciesToFields($fields);
@@ -84,7 +85,7 @@ class ExtensionImport extends BaseImport
                     $queryBuilder->expr()->eq('name', $queryBuilder->createNamedParameter($row['extension_key']))
                 )->executeQuery()->fetchAssociative();
 
-            $connection = GeneralUtility::makeInstance(ConnectionPool::class)
+            $connection = $this->connectionPool
                 ->getConnectionForTable($table);
 
             // update
@@ -98,7 +99,7 @@ class ExtensionImport extends BaseImport
                 );
             } else {
                 // insert
-                $fields['crdate'] = $GLOBALS['EXEC_TIME'];
+                $fields['crdate'] = $now;
                 $connection->insert($table, $fields);
             }
         }

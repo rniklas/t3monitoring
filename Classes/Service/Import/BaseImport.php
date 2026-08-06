@@ -14,25 +14,22 @@ namespace T3Monitor\T3monitoring\Service\Import;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use T3Monitor\T3monitoring\Domain\Model\Dto\EmMonitoringConfiguration;
 use TYPO3\CMS\Core\Context\Context;
+use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Registry;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class BaseImport
 {
-    protected EmMonitoringConfiguration $emConfiguration;
-    protected Registry $registry;
-    protected EventDispatcherInterface $eventDispatcher;
-
-    public function __construct()
-    {
-        $this->emConfiguration = GeneralUtility::makeInstance(EmMonitoringConfiguration::class);
-        $this->registry = GeneralUtility::makeInstance(Registry::class);
-        $this->eventDispatcher = GeneralUtility::makeInstance(EventDispatcherInterface::class);
-    }
+    public function __construct(
+        protected readonly Context $context,
+        protected readonly ConnectionPool $connectionPool,
+        protected EmMonitoringConfiguration $emConfiguration,
+        protected Registry $registry,
+        protected EventDispatcherInterface $eventDispatcher,
+    ) {}
 
     protected function setImportTime(string $action): void
     {
-        $now = GeneralUtility::makeInstance(Context::class)->getAspect('date')->get('timestamp');
+        $now = $this->context->getAspect('date')->get('timestamp');
         $this->registry->set('t3monitoring', 'import' . ucfirst($action), $now);
     }
 }

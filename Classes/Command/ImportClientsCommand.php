@@ -11,19 +11,16 @@ namespace T3Monitor\T3monitoring\Command;
  * LICENSE.txt file that was distributed with this source code.
  */
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use T3Monitor\T3monitoring\Service\Import\ClientImport;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
+#[AsCommand('monitoring:importClients', 'Fetch status from clients')]
 class ImportClientsCommand extends Command
 {
-    protected function configure(): void
-    {
-        $this->setDescription('Import clients');
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $import = GeneralUtility::makeInstance(ClientImport::class);

@@ -1,11 +1,16 @@
 includes:
 	- phpstan-baseline.neon
-	- .Build/tools/phpstan/vendor/bnf/phpstan-psr-container/extension.neon
-	- .Build/tools/phpstan/vendor/phpstan/phpstan-phpunit/extension.neon
-	- .Build/tools/phpstan/vendor/phpstan/phpstan-phpunit/rules.neon
 
 parameters:
-	level: 5
+	level: 7
+	treatPhpDocTypesAsCertain: false
 	paths:
 		- Classes
 		- Tests
+	ignoreErrors:
+	  - identifier: missingType.iterableValue
+	strictRules:
+		booleansInConditions: false
+		booleansInLoopConditions: false
+		disallowedEmpty: false
+		disallowedShortTernary: false
