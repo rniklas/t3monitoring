@@ -118,6 +118,7 @@ class EmailNotification implements LoggerAwareInterface
     protected function getFluidTemplate(array $arguments, string $file, string $format = 'html'): string
     {
         $path = GeneralUtility::getFileAbsFileName('EXT:t3monitoring/Resources/Private/Templates/Notification/' . $file);
+
         $vfd = new ViewFactoryData(
             templatePathAndFilename: $path,
             format: $format,
