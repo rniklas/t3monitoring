@@ -27,3 +27,21 @@
 .dt-info {
     padding: 0.5rem 1rem;
 }
+
+/* Restore TYPO3 v12+ row coloring that datatables.min.css's Bootstrap 5 background-color rule overrides. */
+table.table.dataTable > :not(caption) > * > .primary,
+table.table.dataTable > :not(caption) > * > .secondary,
+table.table.dataTable > :not(caption) > * > .info,
+table.table.dataTable > :not(caption) > * > .success,
+table.table.dataTable > :not(caption) > * > .warning,
+table.table.dataTable > :not(caption) > * > .danger,
+table.table.dataTable > :not(caption) > * > .notice,
+table.table.dataTable > :not(caption) > * > .default,
+table.table.dataTable > :not(caption) > * > .active,
+table.table.dataTable > :not(caption) > * > .selected,
+table.table.dataTable > :not(caption) > * > .installed,
+table.table.dataTable > :not(caption) > * > .insecure,
+table.table.dataTable > :not(caption) > * > .outdated,
+table.table.dataTable > :not(caption) > * > .available {
+    background-color: var(--typo3-table-bg-state, var(--typo3-table-bg-type, var(--typo3-table-bg)));
+}
